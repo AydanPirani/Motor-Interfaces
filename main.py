@@ -1,17 +1,42 @@
 from tkinter import *
 
-
+window = Tk()
 current_device = None
+current_distance = None
+x_label = y_label = z_label = None
+
+device_props = {
+    "device1": {
+        "name": "Device 1",
+        "location": {"x": 0, "y": 0, "z": 0}
+    },
+    "device2": {
+            "name": "Device 2",
+            "location": {"x": 0, "y": 0, "z": 0}
+        },
+    "device3": {
+            "name": "Device 3",
+            "location": {"x": 0, "y": 0, "z": 0}
+        },
+}
+
+def display(label, text):
+    label.config(text=text)
+    return
 
 
 def move(axis, direction, label):
+    dist = current_distance.get()
+    direction *= abs(int(dist)) if dist else 1
+
     if not current_device:
         print("Please select a device to connect to first.")
         return
     else:
         # TODO: PHYSICALLY MOVE DEVICES
         print(axis, direction)
-        label.config(text=str(int(label["text"]) + direction))
+        display(label, int(label["text"]) + direction)
+        device_props[str(current_device)]["location"][axis] += direction
     return
 
 
@@ -24,7 +49,11 @@ def change_device(n_device, label):
         # TODO: PHYSICALLY CONNECT TO NEW DEVICE
         current_device = n_device
 
-        label.config(text="Currently connected to \"{}\"".format(current_device))
+        display(label, "Currently connected to \"{}\"".format(device_props[current_device]["name"]))
+
+        display(x_label, device_props[str(current_device)]["location"]["x"])
+        display(y_label, device_props[str(current_device)]["location"]["y"])
+        display(z_label, device_props[str(current_device)]["location"]["z"])
 
         print("Changed device to {}!".format(current_device))
     return
@@ -33,16 +62,21 @@ def change_device(n_device, label):
 def create_devices_frame(head):
     devices = Frame(head)
 
+    global current_distance
+    current_distance = Entry(devices)
+
     currently_connected = Label(devices, text="Connect to a device to start!")
-    device1 = Button(devices, text="Device1", command=lambda: change_device("device1", currently_connected))
-    device2 = Button(devices, text="Device2", command=lambda: change_device("device2", currently_connected))
-    device3 = Button(devices, text="Device3", command=lambda: change_device("device3", currently_connected))
+    device1 = Button(devices, text=device_props["device1"]["name"], command=lambda: change_device("device1", currently_connected))
+    device2 = Button(devices, text=device_props["device2"]["name"], command=lambda: change_device("device2", currently_connected))
+    device3 = Button(devices, text=device_props["device3"]["name"], command=lambda: change_device("device3", currently_connected))
 
     device1.grid(row=1, column=1, padx=10)
     device2.grid(row=1, column=2, padx=10)
     device3.grid(row=1, column=3, padx=10)
     currently_connected.grid(row=2, columnspan=3, pady=5)
-
+    Label(text="").grid(row=3)
+    Label(devices, text="Movement Distance: ").grid(row=4, column=1)
+    current_distance.grid(row=4, column=2, columnspan=2)
     return devices
 
 
@@ -57,6 +91,7 @@ def create_movements_frame(head):
     z_positive = Button(movements, text="+z", width=5, command=lambda: move("z", 1, z_label))
     z_negative = Button(movements, text="-z", width=5, command=lambda: move("z", -1, z_label))
 
+    global x_label, y_label, z_label
     x_label = Label(movements, text="0", width=4, height=2)
     y_label = Label(movements, text="0", width=4)
     z_label = Label(movements, text="0", width=4)
@@ -77,12 +112,10 @@ def create_movements_frame(head):
     return movements
 
 
-window = Tk()
-
 frame1 = Frame(window)
 
-devices_frame = create_devices_frame(window)
 movements_frame = create_movements_frame(window)
+devices_frame = create_devices_frame(window)
 
 Label(frame1, text="Graph").grid(row=2, column=2)
 
@@ -92,6 +125,7 @@ movements_frame.grid(row=2, padx=20, pady=20)
 
 Label(window, text="graph", bg="white", height=10, width=20).grid(row=2, column=3, padx=20)
 
+window.title("Device Control Interface")
 window.rowconfigure([2], weight=1)
 window.columnconfigure([2], weight=1)
 window.mainloop()
