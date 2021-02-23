@@ -13,13 +13,13 @@ device_props = {
         "location": {"x": 0, "y": 0, "z": 0}
     },
     "device2": {
-            "name": "Device 2",
-            "location": {"x": 0, "y": 0, "z": 0}
-        },
+        "name": "Device 2",
+        "location": {"x": 0, "y": 0, "z": 0}
+    },
     "device3": {
-            "name": "Device 3",
-            "location": {"x": 0, "y": 0, "z": 0}
-        },
+        "name": "Device 3",
+        "location": {"x": 0, "y": 0, "z": 0}
+    },
 }
 
 
