@@ -1,3 +1,5 @@
+import threading
+import time
 from tkinter import *
 
 window = None
@@ -31,11 +33,9 @@ def move(axis, direction, label):
     direction *= abs(int(dist)) if dist else 1
 
     if not current_device:
-        print("Please select a device to connect to first.")
         return
     else:
         # TODO: PHYSICALLY MOVE DEVICES
-        print(axis, direction)
         display(label, int(label["text"]) + direction)
         device_props[str(current_device)]["location"][axis] += direction
     return
@@ -44,7 +44,6 @@ def move(axis, direction, label):
 def change_device(n_device, label):
     global current_device
     if current_device == n_device:
-        print("Same device, no change!")
         return
     else:
         # TODO: PHYSICALLY CONNECT TO NEW DEVICE
@@ -56,7 +55,6 @@ def change_device(n_device, label):
         display(y_label, device_props[str(current_device)]["location"]["y"])
         display(z_label, device_props[str(current_device)]["location"]["z"])
 
-        print("Changed device to {}!".format(current_device))
     return
 
 
@@ -133,5 +131,27 @@ def create_window():
 
     return head
 
-window = create_window()
-window.mainloop()
+
+def gen_value():
+    for i in range(10):
+        print(i**2)
+        time.sleep(0.5)
+
+
+def task_1():
+    for _ in range(10):
+        print(1)
+        time.sleep(0.5)
+
+
+def task_2():
+    global window
+    window = create_window()
+    window.mainloop()
+    window = create_window()
+
+
+t2 = threading.Thread(target=task_1)
+t1 = threading.Thread(target=task_2)
+t1.start()
+t2.start()
