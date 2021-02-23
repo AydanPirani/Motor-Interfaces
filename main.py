@@ -1,6 +1,6 @@
 from tkinter import *
 
-window = Tk()
+window = None
 current_device = None
 current_distance = None
 x_label = y_label = z_label = None
@@ -19,6 +19,7 @@ device_props = {
             "location": {"x": 0, "y": 0, "z": 0}
         },
 }
+
 
 def display(label, text):
     label.config(text=text)
@@ -112,20 +113,25 @@ def create_movements_frame(head):
     return movements
 
 
-frame1 = Frame(window)
+def create_window():
+    head = Tk()
+    frame1 = Frame(head)
+    movements_frame = create_movements_frame(head)
+    devices_frame = create_devices_frame(head)
 
-movements_frame = create_movements_frame(window)
-devices_frame = create_devices_frame(window)
+    Label(frame1, text="Graph").grid(row=2, column=2)
 
-Label(frame1, text="Graph").grid(row=2, column=2)
+    devices_frame.grid(row=1, columnspan=3, padx=20, pady=20)
+    Label(head, text="").grid(row=2)
+    movements_frame.grid(row=2, padx=20, pady=20)
 
-devices_frame.grid(row=1, columnspan=3, padx=20, pady=20)
-Label(window, text="").grid(row=2)
-movements_frame.grid(row=2, padx=20, pady=20)
+    Label(head, text="graph", bg="white", height=10, width=20).grid(row=2, column=3, padx=20)
 
-Label(window, text="graph", bg="white", height=10, width=20).grid(row=2, column=3, padx=20)
+    head.title("Device Control Interface")
+    head.rowconfigure([2], weight=1)
+    head.columnconfigure([2], weight=1)
 
-window.title("Device Control Interface")
-window.rowconfigure([2], weight=1)
-window.columnconfigure([2], weight=1)
+    return head
+
+window = create_window()
 window.mainloop()
