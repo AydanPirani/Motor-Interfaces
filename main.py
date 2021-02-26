@@ -26,8 +26,8 @@ device_props = {
 }
 
 fig = plt.figure()
-plt.xlabel('Width')
-plt.ylabel('Height')
+plt.xlabel("Time Elapsed")
+plt.ylabel("Square of Time Elapsed")
 ax = fig.gca()
 
 x = []
@@ -153,11 +153,21 @@ def task():
         sys.exit()
     global iterations, figure_frame, ax
     iterations += 1
+    x.append(iterations)
+    y.append(iterations ** 2)
     ax.plot(iterations, iterations ** 2, ".")
     figure_frame = FigureCanvasTkAgg(fig, window).get_tk_widget()
     figure_frame.grid(row=2, column=3, padx=20)
     window.after(2000, task)
 
 
+def on_close():
+    print(x)
+    print()
+    print(y)
+    window.destroy()
+
+
 window.after(2000, task)
+window.protocol("WM_DELETE_WINDOW", on_close)
 window.mainloop()
