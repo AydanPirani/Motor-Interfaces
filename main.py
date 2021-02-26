@@ -1,6 +1,7 @@
 from tkinter import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from random import random
 
 window = None
 current_device = None
@@ -142,21 +143,37 @@ def create_window():
     return head
 
 
-iterations = 0
+x_coord = 0
 window = create_window()
+max_x = max_y = 0
+annotation = None
 
 
 def task():
     if not window:
         sys.exit()
-    global iterations, figure_frame, ax
-    iterations += 1
-    x.append(iterations)
-    y.append(iterations ** 2)
-    ax.plot(iterations, iterations ** 2, ".")
+
+    global annotation, max_x, max_y, x_coord, figure_frame, ax
+
+    x_coord += 1
+    y_coord = random()
+
+    x.append(x_coord)
+    y.append(y_coord)
+    if len(x) > 1:
+        ax.plot(x[-2::], y[-2::], color="dimgray")
+    ax.plot(x_coord, y_coord, "o", color="dimgray")
+
+    if y_coord > max_y:
+        if annotation:
+            annotation.remove()
+        max_x = x_coord
+        max_y = y_coord
+        annotation = plt.annotate("Max: t={}".format(x_coord), (x_coord, y_coord))
+
     figure_frame = FigureCanvasTkAgg(fig, window).get_tk_widget()
     figure_frame.grid(row=2, column=3, padx=20)
-    window.after(2000, task)
+    window.after(1000, task)
 
 
 def on_close():
@@ -166,6 +183,6 @@ def on_close():
     window.destroy()
 
 
-window.after(2000, task)
+window.after(1000, task)
 window.protocol("WM_DELETE_WINDOW", on_close)
 window.mainloop()
