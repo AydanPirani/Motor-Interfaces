@@ -1,10 +1,13 @@
 import threading
 import time
 from tkinter import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 window = None
 current_device = None
 current_distance = None
+figure_frame = None
 x_label = y_label = z_label = None
 
 device_props = {
@@ -21,6 +24,14 @@ device_props = {
         "location": {"x": 0, "y": 0, "z": 0}
     },
 }
+
+fig = plt.figure()
+plt.xlabel('Width')
+plt.ylabel('Height')
+ax = fig.gca()
+
+x = []
+y = []
 
 
 def display(label, text):
@@ -65,15 +76,18 @@ def create_devices_frame(head):
     current_distance = Entry(devices)
 
     currently_connected = Label(devices, text="Connect to a device to start!")
-    device1 = Button(devices, text=device_props["device1"]["name"], command=lambda: change_device("device1", currently_connected))
-    device2 = Button(devices, text=device_props["device2"]["name"], command=lambda: change_device("device2", currently_connected))
-    device3 = Button(devices, text=device_props["device3"]["name"], command=lambda: change_device("device3", currently_connected))
+    device1 = Button(devices, text=device_props["device1"]["name"],
+                     command=lambda: change_device("device1", currently_connected))
+    device2 = Button(devices, text=device_props["device2"]["name"],
+                     command=lambda: change_device("device2", currently_connected))
+    device3 = Button(devices, text=device_props["device3"]["name"],
+                     command=lambda: change_device("device3", currently_connected))
 
     device1.grid(row=1, column=1, padx=10)
     device2.grid(row=1, column=2, padx=10)
     device3.grid(row=1, column=3, padx=10)
     currently_connected.grid(row=2, columnspan=3, pady=5)
-    Label(text="").grid(row=3)
+    Label(head, text="").grid(row=3)
     Label(devices, text="Movement Distance: ").grid(row=4, column=1)
     current_distance.grid(row=4, column=2, columnspan=2)
     return devices
@@ -113,45 +127,37 @@ def create_movements_frame(head):
 
 def create_window():
     head = Tk()
-    frame1 = Frame(head)
     movements_frame = create_movements_frame(head)
     devices_frame = create_devices_frame(head)
-
-    Label(frame1, text="Graph").grid(row=2, column=2)
 
     devices_frame.grid(row=1, columnspan=3, padx=20, pady=20)
     Label(head, text="").grid(row=2)
     movements_frame.grid(row=2, padx=20, pady=20)
 
-    Label(head, text="graph", bg="white", height=10, width=20).grid(row=2, column=3, padx=20)
+    global fig, figure_frame
+    figure_frame = FigureCanvasTkAgg(fig, head).get_tk_widget()
+    figure_frame.grid(row=2, column=3, padx=20)
 
     head.title("Device Control Interface")
     head.rowconfigure([2], weight=1)
     head.columnconfigure([2], weight=1)
-
     return head
 
 
-def gen_value():
-    for i in range(10):
-        print(i**2)
-        time.sleep(0.5)
+iterations = 0
+window = create_window()
 
 
-def task_1():
-    for _ in range(10):
-        print(1)
-        time.sleep(0.5)
+def task():
+    if not window:
+        sys.exit()
+    global iterations, figure_frame, ax
+    iterations += 1
+    ax.plot(iterations, iterations ** 2, ".")
+    figure_frame = FigureCanvasTkAgg(fig, window).get_tk_widget()
+    figure_frame.grid(row=2, column=3, padx=20)
+    window.after(2000, task)
 
 
-def task_2():
-    global window
-    window = create_window()
-    window.mainloop()
-    window = create_window()
-
-
-t2 = threading.Thread(target=task_1)
-t1 = threading.Thread(target=task_2)
-t1.start()
-t2.start()
+window.after(2000, task)
+window.mainloop()
